@@ -1,3 +1,8 @@
+USAGE:
+    -i: <filename (in cwd)>
+    -n: <P(N,N)>
+    -g: <P(G,G)>
+
 HMM
 ===
 states : { N (Noncoding), P (Coding) }
