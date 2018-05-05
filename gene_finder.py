@@ -130,18 +130,11 @@ def main(argv):
     load_file(filepath)
     gene_sequence = load_file(filepath)[2]
     gene_sequence = gene_sequence.replace('\n', '')
-    # gene_sequence = "AA"+gene_sequence
     codon_sequence = [gene_sequence[i:i+3] for i in range(0,len(gene_sequence),3)]
 
     print(codon_sequence)
     print("pn: %f, pg: %f\n" % (float(pn), float(pg)))
 
-    obs = (
-           "AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT",
-           "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT",
-           "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT",
-           "TAA", "TAC", "TAG", "TAT", "TCA", "TCC", "TCG", "TCT", "TGA", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"
-           )
     states = ('Noncoding', 'Coding')
     start_p = {'Noncoding': 0.99999, 'Coding': 0.00001}
     trans_p = {
@@ -187,7 +180,9 @@ def main(argv):
                            "TTA": 2/69,    "TTC": 44/69,  "TTG": 8/69,    "TTT": 15/69   # TT
                         }
             }
-    h = hmm(obs, states, start_p, trans_p, emit_p)
+    h = hmm(codon_sequence, states, start_p, trans_p, emit_p)
+
+    # Viterbi and Joint Prob
     path = h.viterbi_logspace(codon_sequence, states, start_p, trans_p, emit_p)
     print("joint prob: %f" % h.joint_prob_log(start_p, path, trans_p, codon_sequence, emit_p))
 
@@ -195,6 +190,8 @@ def main(argv):
     genes = []
     start = 0
     end = 0
+
+    # Find the genes from path
     for i in range(0, len(path)):
         if path[i] == 'Coding' and not is_gene:
             is_gene = True
@@ -205,6 +202,5 @@ def main(argv):
             genes.append((start,end))
     print(genes)
 
-    # joint_prob_log(self, init_p, path, trans_p, emit_s, emit_p):
 if __name__ == "__main__":
     main(sys.argv[1:])
